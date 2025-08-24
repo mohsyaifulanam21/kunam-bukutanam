@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KUNAM Buku Tanam</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f5;
+      color: #333;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 { color: #2e7d32; }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      background: #2e7d32;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background: #1b5e20; }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+      display: none;
+    }
+    nav {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html"><strong>Form Input</strong></a> |
+    <a href="hasil.html">Hasil Inputan</a>
+  </nav>
+
+  <header>
+    <h1>KUNAM Buku Tanam</h1>
+    <p>Form Pendaftaran Data Tanam Jagung</p>
+  </header>
+
+  <form id="formTanam">
+    <div class="form-group">
+      <label>CV</label>
+      <input type="text" id="CV" required />
+    </div>
+
+    <div class="form-group">
+      <label>Korlap</label>
+      <input type="text" id="Korlap" required />
+    </div>
+
+    <div class="form-group">
+      <label>Lokasi</label>
+      <input type="text" id="Lokasi" required />
+    </div>
+
+    <div class="form-group">
+      <label>Hibryd</label>
+      <select id="Hibryd" required>
+        <option value="">Pilih Hibryd</option>
+        <option value="TYA">TYA</option>
+        <option value="TYB">TYB</option>
+        <option value="TYC">TYC</option>
+        <option value="TYL">TYL</option>
+        <option value="TYM">TYM</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Blok</label>
+      <input type="text" id="Blok" required />
+    </div>
+
+    <div class="form-group">
+      <label>Nama Petani</label>
+      <input type="text" id="NamaPetani" required />
+    </div>
+
+    <div class="form-group">
+      <label>No. HP Petani</label>
+      <input type="number" id="NoHP" required />
+    </div>
+
+    <div class="form-group">
+      <label>Luas (ha)</label>
+      <input type="number" step="0.01" id="Luas" required />
+    </div>
+
+    <div class="form-group">
+      <label>Tanggal Tanam</label>
+      <input type="date" id="TanggalTanam" required />
+    </div>
+
+    <div class="form-group">
+      <label>Tanaman Sebelumnya</label>
+      <select id="TanamanSebelumnya" required>
+        <option value="">Pilih</option>
+        <option value="CORN">CORN</option>
+        <option value="NON CORN">NON CORN</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Olah Tanah</label>
+      <select id="OlahTanah" required>
+        <option value="">Pilih</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Bedding</label>
+      <select id="Bedding" required>
+        <option value="">Pilih</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Rasio</label>
+      <select id="Rasio" required>
+        <option value="">Pilih</option>
+        <option value="4:2">4:2</option>
+        <option value="5:2">5:2</option>
+        <option value="6:2">6:2</option>
+        <option value="6:2+1">6:2+1</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>KML Sudah Dikirim ke Broker</label>
+      <select id="KML" required>
+        <option value="">Pilih</option>
+        <option value="Done">Done</option>
+        <option value="Not Yet">Not Yet</option>
+      </select>
+    </div>
+
+    <button type="submit">Kirim Data</button>
+  </form>
+
+  <p id="successMsg" class="success">
+    Laporan tanam berhasil, jangan lupa dirawat tanamannya!
+  </p>
+
+  <script>
+    const form = document.getElementById('formTanam');
+    const successMsg = document.getElementById('successMsg');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const payload = {
+        CV: document.getElementById('CV').value,
+        Korlap: document.getElementById('Korlap').value,
+        Lokasi: document.getElementById('Lokasi').value,
+        Hibryd: document.getElementById('Hibryd').value,
+        Blok: document.getElementById('Blok').value,
+        NamaPetani: document.getElementById('NamaPetani').value,
+        NoHP: document.getElementById('NoHP').value,
+        Luas: document.getElementById('Luas').value,
+        TanggalTanam: document.getElementById('TanggalTanam').value,
+        TanamanSebelumnya: document.getElementById('TanamanSebelumnya').value,
+        OlahTanah: document.getElementById('OlahTanah').value,
+        Bedding: document.getElementById('Bedding').value,
+        Rasio: document.getElementById('Rasio').value,
+        KML: document.getElementById('KML').value
+      };
+
+      try {
+        await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwGAcCG1O8SUrMahfhcwV8W2rziBi0qYfGGwngWzTKN40gPUV3Nq3gXzaq7O9x_sQEl/exec/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        form.reset();
+        successMsg.style.display = 'block';
+        setTimeout(() => successMsg.style.display = 'none', 5000);
+
+      } catch (error) {
+        alert("Gagal mengirim data. Coba lagi.");
+      }
+    });
+  </script>
+</body>
+</html>

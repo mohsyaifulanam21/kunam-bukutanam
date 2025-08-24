@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hasil Inputan - KUNAM</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+      background: #f7f9f7;
+      color: #333;
+    }
+    nav {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+    h1, h2, h3 { color: #2e7d32; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #e8f5e8;
+      color: #1b5e20;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #555;
+      margin: 5px 0;
+      font-style: italic;
+    }
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Form Input</a> |
+    <a href="hasil.html"><strong>Hasil Inputan</strong></a>
+  </nav>
+
+  <h1>KUNAM Buku Tanam</h1>
+  <h2>Hasil Inputan Data Tanam</h2>
+
+  <h3>Total Luas Lahan per Korlap</h3>
+  <table id="totalTable">
+    <thead>
+      <tr>
+        <th>Korlap</th>
+        <th>Total Luas (ha)</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <h3>Jadwal Perawatan Tanaman Jagung (Siklus 120 Hari)</h3>
+  <table id="jadwalTable">
+    <thead>
+      <tr>
+        <th>Nama Petani</th>
+        <th>Lokasi</th>
+        <th>Tanggal Tanam</th>
+        <th>H+7</th>
+        <th>H+10</th>
+        <th>H+12</th>
+        <th>H+15</th>
+        <th>H+21</th>
+        <th>H+25</th>
+        <th>H+35</th>
+        <th>H+42</th>
+        <th>H+44</th>
+        <th>H+45</th>
+        <th>H+60</th>
+        <th>H+75</th>
+        <th>H-10</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <p class="loading" id="loading">Memuat data dari Google Sheets...</p>
+
+  <script>
+    const totalTable = document.getElementById('totalTable').getElementsByTagName('tbody')[0];
+    const jadwalTable = document.getElementById('jadwalTable').getElementsByTagName('tbody')[0];
+    const loading = document.getElementById('loading');
+
+    async function loadData() {
+      try {
+        const response = await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwGAcCG1O8SUrMahfhcwV8W2rziBi0qYfGGwngWzTKN40gPUV3Nq3gXzaq7O9x_sQEl/exec/exec');
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
+          loading.textContent = "Belum ada data yang diinput.";
+          return;
+        }
+
+        // Hitung total luas per Korlap
+        const totalPerKorlap = {};
+        data.forEach(row => {
+          const korlap = row.Korlap;
+          const luas = parseFloat(row.Luas) || 0;
+          if (korlap) {
+            totalPerKorlap[korlap] = (totalPerKorlap[korlap] || 0) + luas;
+          }
+        });
+
+        for (const [korlap, total] of Object.entries(totalPerKorlap)) {
+          const tr = totalTable.insertRow();
+          tr.insertCell(0).textContent = korlap;
+          tr.insertCell(1).textContent = total.toFixed(2);
+        }
+
+        // Generate jadwal perawatan
+        data.forEach(row => {
+          const tr = jadwalTable.insertRow();
+          tr.insertCell(0).textContent = row.NamaPetani;
+          tr.insertCell(1).textContent = row.Lokasi;
+
+          const tanggalTanam = new Date(row.TanggalTanam);
+          tr.insertCell(2).textContent = tanggalTanam.toLocaleDateString('id-ID');
+
+          // Fungsi bantu hitung tanggal
+          const addDays = (date, days) => {
+            const result = new Date(date);
+            result.setDate(date.getDate() + days);
+            return result.toLocaleDateString('id-ID');
+          };
+
+          // Ambil varietas
+          const hibryd = row.Hibryd;
+
+          // H+7
+          tr.insertCell(3).textContent = addDays(tanggalTanam, 7);
+          const cell3 = tr.cells[3];
+          const note7 = document.createElement('div');
+          note7.className = 'note';
+          note7.textContent = 'Cek Germinasi';
+          cell3.appendChild(note7);
+
+          // H+10
+          tr.insertCell(4).textContent = addDays(tanggalTanam, 10);
+          const cell4 = tr.cells[4];
+          const note10 = document.createElement('div');
+          note10.className = 'note';
+          note10.textContent = 'Pupuk: Urea + Phonska';
+          cell4.appendChild(note10);
+
+          // H+12
+          tr.insertCell(5).textContent = addDays(tanggalTanam, 12);
+          const cell5 = tr.cells[5];
+          const note12 = document.createElement('div');
+          note12.className = 'note';
+          note12.textContent = 'Herbisida Selektif';
+          cell5.appendChild(note12);
+
+          if (hibryd === 'TYL' || hibryd === 'TYM') {
+            const glifosat = document.createElement('div');
+            glifosat.className = 'note';
+            glifosat.style.color = 'red';
+            glifosat.textContent = '+ Glifosat';
+            cell5.appendChild(glifosat);
+          }
+
+          // H+15
+          tr.insertCell(6).textContent = addDays(tanggalTanam, 15);
+          const cell6 = tr.cells[6];
+          const note15 = document.createElement('div');
+          note15.className = 'note';
+          note15.textContent = 'Insektisida, Fungisida, PPC';
+          cell6.appendChild(note15);
+
+          // H+21
+          tr.insertCell(7).textContent = addDays(tanggalTanam, 21);
+          const cell7 = tr.cells[7];
+          const note21 = document.createElement('div');
+          note21.className = 'note';
+          note21.textContent = 'Pupuk: Urea + Phonska + KCL';
+          cell7.appendChild(note21);
+
+          // H+25
+          tr.insertCell(8).textContent = addDays(tanggalTanam, 25);
+          const cell8 = tr.cells[8];
+          const note25 = document.createElement('div');
+          note25.className = 'note';
+          note25.textContent = 'Insektisida, Fungisida, PPC';
+          cell8.appendChild(note25);
+
+          // H+35
+          tr.insertCell(9).textContent = addDays(tanggalTanam, 35);
+          const cell9 = tr.cells[9];
+          const note35 = document.createElement('div');
+          note35.className = 'note';
+          note35.textContent = 'Insektisida, Fungisida, PPC';
+          cell9.appendChild(note35);
+
+          // H+42
+          tr.insertCell(10).textContent = addDays(tanggalTanam, 42);
+          const cell10 = tr.cells[10];
+          const note42 = document.createElement('div');
+          note42.className = 'note';
+          note42.textContent = 'Pupuk: Urea';
+          cell10.appendChild(note42);
+
+          // H+44
+          tr.insertCell(11).textContent = addDays(tanggalTanam, 44);
+          const cell11 = tr.cells[11];
+          const note44 = document.createElement('div');
+          note44.className = 'note';
+          note44.textContent = 'Herbisida Gramoxone';
+          cell11.appendChild(note44);
+
+          // H+45
+          tr.insertCell(12).textContent = addDays(tanggalTanam, 45);
+          const cell12 = tr.cells[12];
+          const note45 = document.createElement('div');
+          note45.className = 'note';
+          note45.textContent = 'Insektisida, Fungisida, PPC';
+          cell12.appendChild(note45);
+
+          // H+60
+          tr.insertCell(13).textContent = addDays(tanggalTanam, 60);
+          const cell13 = tr.cells[13];
+          const note60 = document.createElement('div');
+          note60.className = 'note';
+          note60.textContent = 'Estimasi Detaselling';
+          cell13.appendChild(note60);
+
+          // H+75
+          tr.insertCell(14).textContent = addDays(tanggalTanam, 75);
+          const cell14 = tr.cells[14];
+          const note75 = document.createElement('div');
+          note75.className = 'note';
+          note75.textContent = 'Babat Jantan';
+          cell14.appendChild(note75);
+
+          // H-10 (10 hari sebelum panen = H+110)
+          const panen = new Date(tanggalTanam);
+          panen.setDate(tanggalTanam.getDate() + 110); // H-10 dari H+120
+          tr.insertCell(15).textContent = panen.toLocaleDateString('id-ID');
+          const cell15 = tr.cells[15];
+          const noteHmin10 = document.createElement('div');
+          noteHmin10.className = 'note';
+          noteHmin10.textContent = 'Persiapan Panen (cek kadar air)';
+          cell15.appendChild(noteHmin10);
+        });
+
+        loading.style.display = 'none';
+      } catch (error) {
+        loading.textContent = "Gagal memuat data. Periksa koneksi atau URL script.";
+        console.error("Error:", error);
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
